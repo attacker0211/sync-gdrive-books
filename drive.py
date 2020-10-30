@@ -90,11 +90,3 @@ class GoogleDrive():
                 print("Download %d%%." % int(status.progress() * 100), end='\r')
                 sys.stdout.flush()
             print('')
-
-if __name__ == "__main__":
-    ss = GoogleDrive('token.pickle', 'credentials.json')
-    ss.authenticate()
-    folder_id = ss.search("mimeType = 'application/vnd.google-apps.folder' and name='test'", "folder")
-    # ss.upload(folder_id, os.environ['HOME'] + "/math-solutions/1300/")
-    file_infos = ss.search("mimeType='application/pdf' and parents in '{}'".format(folder_id), "file")
-    ss.download(folder_id, file_infos, os.environ['HOME'] + "/downloads/")
