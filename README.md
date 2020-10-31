@@ -23,6 +23,7 @@ This script is flexible, can be changed for other file types.
 
 ### Usage
 ```
+pip install google-api-python-client google_auth-oauthlib
 git clone https://github.com/attacker0211/sync-gdrive-books.git ~/drive
 cd drive
 # name your file "credentials.json" and move it to this folder.
