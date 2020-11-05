@@ -1,4 +1,3 @@
-from __future__ import print_function
 import pickle
 import os
 import io
@@ -9,8 +8,10 @@ from googleapiclient.http import MediaFileUpload
 from googleapiclient.http import MediaIoBaseDownload
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
+from pathlib import Path
 
-SCOPES = 'https://www.googleapis.com/auth/drive'
+SCOPES = "https://www.googleapis.com/auth/drive"
+mimes = {"pdf" : 'application/pdf', "aiff" : 'audio/x-aiff', "aif" : 'audio/aiff', "jpg" : 'image/jpeg', "drive-folder" : 'application/vnd.google-apps.folder', "wav" : 'audio/wav'}
 
 class GoogleDrive():
     def __init__(self, tokFile, credFile, scopeType=SCOPES):
@@ -42,7 +43,7 @@ class GoogleDrive():
         results = []
         for item in response.get('files', []):
             print(u'{0} ({1})'.format(item['name'], item['id']))
-            if searchType == "folder":
+            if searchType == "single":
                 return item['id']
             else:
                 results.append((item['id'], item['name']))
@@ -73,8 +74,11 @@ class GoogleDrive():
             f = self.service.files().create(body=file_metadata, media_body=media, fields='id').execute() 
             print("file id: %s" % f.get('id'))
 
-    def download(self, folder_id, file_infos, dest, fileExt):
-        ffiles = self.remove_duplicate_d(file_infos, dest, fileExt)
+    def download(self, folder_id, dest, fileExt):
+        file_infos = self.search("mimeType='{}' and parents in '{}'".format(mimes[fileExt], folder_id), "multiple")
+        if not os.path.exists(dest):
+            os.makedirs(dest)
+        ffiles = self.remove_duplicate_d(file_infos, dest, "." + fileExt)
         for file_info in ffiles:
             request = self.service.files().get_media(fileId=file_info[0])
             fh = io.FileIO(dest + file_info[1], 'wb')
@@ -87,6 +91,13 @@ class GoogleDrive():
                     fh.close()
                     os.remove(dest + file_info[0])
                     sys.exit(1)
-                print("Download %d%%." % int(status.progress() * 100), end='\r')
+                print("Download %s %d%%." % (file_info[1], int(status.progress() * 100)), end='\r')
                 sys.stdout.flush()
             print('')
+
+    def downloadRec(self, folder_id, dest, fileExt):
+        self.download(folder_id, dest, fileExt)
+        print("finding subfolders...")
+        sub_folders = self.search("mimeType='{}' and parents in '{}'".format(mimes["drive-folder"], folder_id), "multiple")
+        for subf in sub_folders:
+            self.downloadRec(subf[0], dest+subf[1]+"/", fileExt)
