@@ -2,9 +2,7 @@
 
 I'm tired of clicking buttons to download and extract and upload to sync books accross my devices. 
 
-And PEOPLE ON THE INTERNET CAN'T WRITE A SIMPLE ENOUGH SCRIPTS FOR ME TO USE. 
-
-Like, I only want to upload/download pdf files and I also want to automate `python3 abcd.py arg1 arg2` CAUSE I'M LAZY. 
+Like, I only want to upload/download pdf files and I also want to automate `python3 abcd.py arg1 arg2`. 
 
 This script is flexible, can be changed for other file types.
 
