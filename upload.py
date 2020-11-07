@@ -9,7 +9,7 @@ def upload():
     else:
         ss = drive.GoogleDrive('token.pickle', 'credentials.json')
         ss.authenticate()
-        folder_id = ss.search("mimeType = 'application/vnd.google-apps.folder' and name='%s'" % sys.argv[1], "single")
+        folder_id = ss.check_folder(sys.argv[1], None) 
         ss.upload(folder_id, os.environ['HOME'] + sys.argv[2], sys.argv[3]) 
         
 if "__name__ == __main__":
